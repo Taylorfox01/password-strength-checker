@@ -2,51 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Random Team Picker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Password Strength Checker</title>
 <style>
-body{font-family:Arial;background:#eef2ff;padding:25px}
-main{max-width:650px;margin:auto;background:white;padding:30px;border-radius:16px}
-textarea,input{width:100%;padding:13px;box-sizing:border-box;margin:10px 0;border:1px solid #a5b4fc;border-radius:8px}
-textarea{height:170px}
-button{background:#4f46e5;color:white;padding:14px 20px;border:0;border-radius:8px;cursor:pointer}
-.team{background:#e0e7ff;padding:20px;margin-top:15px;border-radius:10px;white-space:pre-line;overflow-wrap:anywhere}
+body{font-family:Arial;background:#fff1f2;padding:25px}
+main{max-width:500px;margin:auto;background:white;padding:25px;border-radius:15px}
+input{width:100%;padding:13px;box-sizing:border-box;margin:12px 0}
+#bar{height:12px;background:#e5e7eb;border-radius:10px;overflow:hidden}
+#fill{height:100%;width:0;background:#ef4444;transition:.2s}
+#result{padding:15px;background:#fce7f3;margin-top:15px;border-radius:8px}
 </style>
 </head>
 <body>
 <main>
-<h1>Random Team Picker</h1>
-<p>Divide participants into randomized teams.</p>
-<textarea id="names" placeholder="Enter one name per line"></textarea>
-<label>Number of Teams</label>
-<input id="count" type="number" min="2" value="2">
-<button onclick="generate()">Generate Teams</button>
-<div id="teams"></div>
+<h1>Password Strength Checker</h1>
+<input id="password" type="password" placeholder="Enter a password">
+<div id="bar"><div id="fill"></div></div>
+<div id="result">Enter a password to analyze it.</div>
 </main>
 <script>
-function generate(){
- const names=document.getElementById("names").value
- .split(/\r?\n/).map(n=>n.trim()).filter(Boolean);
- const count=Number(document.getElementById("count").value);
- const area=document.getElementById("teams");
- area.innerHTML="";
- if(!Number.isInteger(count)||count<2||count>names.length){
-  area.textContent="Enter enough participants and a valid team count.";
-  return;
- }
- for(let i=names.length-1;i>0;i--){
-  const j=Math.floor(Math.random()*(i+1));
-  [names[i],names[j]]=[names[j],names[i]];
- }
- const teams=Array.from({length:count},()=>[]);
- names.forEach((name,i)=>teams[i%count].push(name));
- teams.forEach((team,i)=>{
-  const item=document.createElement("div");
-  item.className="team";
-  item.textContent="Team "+(i+1)+"\n\n"+team.join("\n");
-  area.appendChild(item);
- });
+function analyze(){
+ const p=document.getElementById("password").value;
+ const result=document.getElementById("result");
+ let score=0;
+ if(p.length>=8)score++;
+ if(p.length>=12)score++;
+ if(/[a-z]/.test(p)&&/[A-Z]/.test(p))score++;
+ if(/[0-9]/.test(p))score++;
+ if(/[^a-zA-Z0-9]/.test(p))score++;
+ const labels=["Very Weak","Weak","Fair","Good","Strong","Very Strong"];
+ const colors=["#ef4444","#f97316","#eab308","#84cc16","#22c55e","#15803d"];
+ document.getElementById("fill").style.width=(score/5*100)+"%";
+ document.getElementById("fill").style.background=colors[score];
+ result.textContent=p?labels[score]+" — "+score+"/5 checks passed":"Enter a password to analyze it.";
 }
+document.getElementById("password").addEventListener("input",analyze);
 </script>
 </body>
 </html>
